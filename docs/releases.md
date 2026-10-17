@@ -21,38 +21,81 @@ WEB_EXT_API_SECRET=<JWT secret>
 
 `rotblock.env`, `.env`, and other `*.env` files are ignored by Git. Do not paste
 credentials into chat, source, release notes, or command arguments. `npm run sign`
-reads the local credential file automatically; publishing does not load Mozilla credentials.
+reads the local credential file automatically for development signing.
+
+Run `npm run release:secrets` once to configure the two repository Actions secrets.
+A local subprocess loads the ignored file and pipes each value to `gh secret set`
+through stdin. Values are never command arguments, printed output, release state,
+or Git contents. Only the two signing values are sent to GitHub's encrypted secret
+store; the local file is not uploaded. Production jobs use `GITHUB_TOKEN` for GitHub
+writes, so no personal GitHub token is needed.
 
 ## Release procedure
 
 1. Increase the three-part numeric version in both `extension/manifest.json` and
    `package.json` for each release. Update the npm lockfile with `npm install --package-lock-only`.
-2. Run `npm test`, `npm run lint`, `npm run build`, and `npm run test:live` with
-   the dedicated testing profile available. Commit and push the source to `main`.
-3. Run `npm run sign`. It validates the package and submits it as **unlisted**.
-   Mozilla may require review. Keep the signed XPI returned by Mozilla unchanged.
-4. Run `npm run publish -- "path/to/the/signed.xpi"` with GitHub CLI authenticated
-   and write access to `jeemzy/rotblock`.
-5. Install the signed XPI in a testing profile, restart Zen, and check persistence.
-   For the first update test, sign `0.1.1`, publish it, then use the Add-ons Manager's
-   **Check for Updates** command from an installation of signed `0.1.0`.
+2. Run the local checks and commit/push the source to `main`. Browser checks use
+   the dedicated testing profile; GitHub's Ubuntu jobs run unit tests, lint, and build.
+3. Create and push the matching stable tag, for example `git tag v0.2.1` and
+   `git push origin v0.2.1`. Never move or reuse release tags.
+4. **Release build and submit** validates all version fields and the tagged commit's
+   membership in `main`, then builds one ZIP without Mozilla credentials. A separate
+   job saves a draft release and the ZIP before any signing requests. A serialized
+   worker uploads those exact bytes to AMO and advances validation/version creation.
+5. **Finalize releases** runs after submission, every ten minutes at UTC minutes
+   7/17/27/37/47/57, and on manual dispatch. Each run checks pending work once and
+   exits; awaiting validation or approval is successful, with no idle review wait.
+6. When approved, the worker publishes `rotblock-<version>.xpi`, verifies the public
+   download, and only then updates `updates.json` and GitHub's latest-release marker.
+   Install/update in the testing profile and restart Zen for release verification.
+
+Normal `main` commits and pull requests only run checks. Releases remain **unlisted**
+on Mozilla and publicly hosted on GitHub; this does not create an AMO store listing.
+
+## Recovery and integrity
+
+Draft release bodies contain a machine-readable `rotblock-release-state:v1` section
+with the tag, original source SHA, ZIP/payload hashes, upload/version IDs, and phase.
+It contains no credentials. The unsigned ZIP remains a draft-only asset until the
+signed download is verified. Progress survives runner cancellation, expired Actions
+artifacts, manual review delays, and a lost API response. Retrying looks up the
+exact Mozilla version before submitting again. There is no automatic review expiry.
+
+Mozilla reformats manifest JSON during signing. Verification compares that JSON's
+canonical parsed contents, every other extension file's exact bytes, the embedded
+ID/version, and known signature metadata. Only Mozilla signature files are excluded
+from the payload digest. The signed file must also match Mozilla's API SHA-256.
+Firefox verifies the cryptographic signature at installation.
+
+The worker will not replace existing asset bytes, publish a moved tag or changed
+payload, downgrade update metadata, or make an older release latest. Metadata writes
+retry with a fresh file SHA after conflicts. A public download failure preserves
+the previous update manifest; a later run resumes even if the release is already
+public. Completed historical releases are left unchanged.
+
+Use **Actions → Finalize releases → Run workflow** (or `npm run publish`) for a
+fresh status pass. An optional `retry_tag` such as `v0.2.1` retries just that release,
+including a blocked one, after resolving the reported problem. Rejections, disabled
+versions, and integrity failures require attention; transient API errors preserve
+progress for the next run. The workflow summary identifies each release's result.
+
+Submission uses a durable queue before the shared worker lock, so GitHub replacing
+a queued worker does not lose a release request. All production finalizers share
+the same concurrency group. `npm run release:resume` is the internal Actions worker;
+local recovery should dispatch the workflow to retain that serialization.
+
+GitHub schedules can be delayed and may be disabled after 60 days of repository
+inactivity in public repositories. Re-enable the workflow in Actions if needed;
+manual dispatch can resume pending work. No external callback service is required.
 
 For automated Add-ons Manager inspection, use `npm run browser:system`.
 This opts the dedicated testing session into geckodriver's browser UI access.
 Normal inspection sessions do not enable it; signature verification stays enabled.
 
-Publishing checks the XPI's embedded ID and version plus Mozilla signature metadata.
-Firefox verifies the actual cryptographic signature at installation. The script
-creates a GitHub Release with `rotblock-<version>.xpi`, downloads that public asset,
-and compares its SHA-256 hash before updating `updates.json` through the GitHub API.
-An unavailable or mismatched download leaves update metadata unchanged. Retrying an
-existing release verifies the existing asset rather than overwriting it. A newer
-published version prevents downgrade, and the API update uses the current file SHA
-to avoid silently overwriting a simultaneous update.
-
 The update JSON contains the version, HTTPS download URL, hash, and Gecko minimum
-version. The browser handles checking and installation. Run `git pull --ff-only`
-after publishing to obtain the remote update-manifest commit before further work.
+version from the signed manifest. The browser handles checking and installation.
+Run `git pull --ff-only` after publication to obtain the bot's update-manifest commit.
+Bot commits use `GITHUB_TOKEN` and do not recursively trigger push workflows.
 GitHub's raw-file endpoint may keep the previous manifest cached for five minutes.
 An immediate browser update check can therefore report no updates; retry once the
 cached manifest expires.

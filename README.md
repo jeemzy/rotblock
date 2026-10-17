@@ -46,8 +46,9 @@ For development, use Node.js 22 or newer and run `npm ci`, then:
 | `npm run test:live` | Check the extension on live YouTube using the signed-in profile. Close the testing session first. |
 | `npm run lint` | Validate the self-distributed extension using Mozilla's linter. |
 | `npm run build` | Build an unsigned versioned ZIP in `artifacts/extension/`. |
-| `npm run sign` | Submit to Mozilla for unlisted signing using local credentials. |
-| `npm run publish -- path/to/signed.xpi` | Upload, verify the download, then publish automatic-update metadata. |
+| `npm run sign` | Sign locally for development; production signing runs in Actions. |
+| `npm run publish` | Dispatch the serialized Actions finalizer for pending releases. |
+| `npm run release:secrets` | Pipe local signing credentials into encrypted Actions secrets. |
 
 Disable rotblock through Zen's Add-ons Manager and reload YouTube if needed.
 The supported interface is desktop YouTube; navigation rules also cover
@@ -55,6 +56,23 @@ The supported interface is desktop YouTube; navigation rules also cover
 It leaves ordinary `/watch` and `/embed` URLs usable, even for a short video.
 No-href Shorts navigation labels were inspected in English; other languages and
 future YouTube layouts may require selector adjustments.
+
+## Release a version
+
+After bumping the manifest, package, and lockfile to the same stable version and
+pushing that commit to `main`, push its matching tag:
+
+```powershell
+git tag v0.2.1
+git push origin v0.2.1
+```
+
+Actions tests and builds that exact commit, saves a draft release, and submits its
+ZIP for unlisted Mozilla signing. Short workflows check pending work every ten
+minutes; no runner waits for approval. The signed XPI is published and verified
+before automatic-update metadata changes. Normal commits do not start a release.
+Use a new version for each release; never move a release tag.
+See [release setup and recovery](docs/releases.md) for credentials and recovery.
 
 ## Start the testing browser
 

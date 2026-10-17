@@ -1,0 +1,54 @@
+name: Finalize releases
+
+on:
+  workflow_run:
+    workflows: ['Release build and submit']
+    types: [completed]
+  schedule:
+    - cron: '7-57/10 * * * *'
+  workflow_dispatch:
+    inputs:
+      retry_tag:
+        description: 'Optional vX.Y.Z tag to retry, including a blocked release'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  finalize:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: rotblock-release-finalize
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          persist-credentials: false
+      - id: pending
+        name: Find unfinished releases without installing dependencies
+        run: node tools/release-pipeline.mjs pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RETRY_TAG: ${{ inputs.retry_tag || '' }}
+      - if: steps.pending.outputs.has_pending == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - if: steps.pending.outputs.has_pending == 'true'
+        run: npm ci
+      - if: steps.pending.outputs.has_pending == 'true'
+        name: Check once and publish any approved versions
+        run: node tools/release-pipeline.mjs resume
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+          RETRY_TAG: ${{ inputs.retry_tag || '' }}

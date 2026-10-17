@@ -10,18 +10,22 @@
   },
   "scripts": {
     "test": "node --test --test-concurrency=1",
-    "test:unit": "node --test test/extension.test.mjs test/release.test.mjs test/stats.test.mjs test/background.test.mjs test/popup.test.mjs",
+    "test:unit": "node --test test/extension.test.mjs test/release.test.mjs test/stats.test.mjs test/background.test.mjs test/popup.test.mjs test/pipeline.test.mjs test/amo.test.mjs test/github-release.test.mjs",
     "test:live": "node tools/live-check.mjs",
     "dev": "web-ext run",
     "lint": "web-ext lint --warnings-as-errors",
     "build": "web-ext build --overwrite-dest",
     "sign": "node tools/release.mjs sign",
-    "publish": "node tools/release.mjs publish",
+    "publish": "gh workflow run release-finalize.yml --ref main",
     "browser": "node tools/browser.mjs",
     "browser:login": "node tools/login.mjs",
     "test:browser": "node --test test/zen.integration.test.mjs",
     "browser:extension": "node tools/browser.mjs --extension",
-    "browser:system": "node tools/browser.mjs --system-access"
+    "browser:system": "node tools/browser.mjs --system-access",
+    "release:verify": "node tools/release-pipeline.mjs verify",
+    "release:queue": "node tools/release-pipeline.mjs queue",
+    "release:resume": "node tools/release-pipeline.mjs resume",
+    "release:secrets": "node tools/configure-actions-secrets.mjs"
   },
   "devDependencies": {
     "adm-zip": "0.6.1",
