@@ -147,6 +147,9 @@ Zen's normal update command upgraded permanent 0.2.0 to signed 0.2.1. The extens
 remained active with `signedState: 2` after restart, retained the exact total of 39
 through update and restart, and passed all 13 live blocker checks afterward.
 The everyday Zen profile was untouched.
+The signed popup page rendered its counts and seven-day chart correctly. An extra
+toolbar-click automation check was inconsistent in Zen and remains inconclusive;
+no popup script error appeared in the browser console.
 
 There are no runtime npm dependencies in the extension. At implementation time,
 `npm audit` reports an upstream `node-forge` advisory through web-ext's Android
