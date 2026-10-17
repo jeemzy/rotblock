@@ -58,6 +58,6 @@ try {
     const { queueRelease } = await import('./release-engine.mjs');
     const release = await queueRelease({ gh: new GitHubClient(), tag: process.env.TAG,
       sourceSha: process.env.SOURCE_SHA, bytes: await readFile(process.env.ZIP_PATH) });
-    await summary(`${release.tag_name}: build durably queued for signing.`);
+    await summary(`${readState(release.body).tag}: build durably queued for signing.`);
   } else throw new Error('Use verify, queue, pending, or resume');
 } catch (error) { console.error(error.message); process.exitCode = 1; }

@@ -53,7 +53,8 @@ async function updateManifest(gh, state, bytes) {
 export async function resumeRelease({ gh, amo, release, retry = false }) {
   let state = readState(release.body);
   if (!state) throw new PermanentError('Release is not managed by this pipeline');
-  if (state.tag !== release.tag_name) throw new PermanentError('Release state does not match its tag');
+  const syntheticDraft = release.draft && release.tag_name.startsWith('untagged-') && release.target_commitish === state.sourceSha;
+  if (state.tag !== release.tag_name && !syntheticDraft) throw new PermanentError('Release state does not match its tag');
   if (state.phase === 'complete') return 'complete';
   if (state.phase === 'blocked' && !retry) return 'blocked';
   const save = async (phase, changes = {}) => {
@@ -97,7 +98,7 @@ export async function resumeRelease({ gh, amo, release, retry = false }) {
     if (hash(await gh.downloadAsset(asset)) !== state.signedHash) throw new PermanentError('GitHub signed asset mismatch');
     for (const temporary of release.assets.filter(a => a.name === unsignedName(state))) await gh.deleteAsset(release, temporary);
     await save('publishing');
-    if (release.draft) release = await gh.patchRelease(release, { draft: false, make_latest: 'false' });
+    if (release.draft) release = await gh.patchRelease(release, { tag_name: state.tag, target_commitish: state.sourceSha, draft: false, make_latest: 'false' });
     const publicBytes = await gh.publicDownload(`https://github.com/${repository}/releases/download/${state.tag}/${signedName(state)}`);
     if (hash(publicBytes) !== state.signedHash) throw new Error('Public release download does not match; update metadata unchanged');
     const current = await updateManifest(gh, state, bytes);

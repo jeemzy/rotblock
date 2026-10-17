@@ -180,3 +180,13 @@ test('published metadata with conflicting bytes is blocked instead of overwritte
   assert.equal(await f.resume(), 'blocked');
   assert.equal(f.events.includes('metadata'), false);
 });
+
+test('GitHub synthetic draft tags retain the intended version and are replaced when publishing', async () => {
+  const f = fixture(); await f.queue();
+  const release = f.releases[0];
+  release.tag_name = 'untagged-placeholder'; release.target_commitish = sha;
+  f.gh.getRelease = async () => release;
+  f.ready(); assert.equal(await f.resume(), 'approval-pending');
+  f.approve(); assert.equal(await f.resume(), 'complete');
+  assert.equal(release.tag_name, 'v0.2.1');
+});

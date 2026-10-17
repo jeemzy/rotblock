@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { repository, hash, PermanentError } from './release-state.mjs';
+import { repository, hash, PermanentError, readState } from './release-state.mjs';
 
 export class GitHubClient {
   #token; #fetch;
@@ -31,7 +31,11 @@ export class GitHubClient {
     // GitHub's tag endpoint describes published releases. Drafts require the
     // authenticated list API, including recovery after an unknown create result.
     return await this.request(`releases/tags/${encodeURIComponent(tag)}`, { optional: true })
-      ?? (await this.listReleases()).find(release => release.tag_name === tag) ?? null;
+      ?? (await this.listReleases()).find(release => {
+        if (release.tag_name === tag) return true;
+        const state = readState(release.body);
+        return release.draft && state?.tag === tag && state.sourceSha === release.target_commitish;
+      }) ?? null;
   }
   async listReleases() {
     const releases = [];
