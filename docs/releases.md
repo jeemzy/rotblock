@@ -137,6 +137,17 @@ approval was pending. An independent check verified Mozilla's signed package has
 and original payload, and found no credential values in tracked files, packages,
 release state, or the successful signing/follow-up logs.
 
+Mozilla approved 0.2.1, but GitHub had not started either of the next scheduled
+slots during verification. Manual dispatch of the same serialized finalizer
+published the signed release in 16 seconds. Its anonymous public download matched
+Mozilla's SHA-256, release state reached `complete`, the unsigned asset was removed,
+and both `updates.json` and GitHub's latest release pointed to 0.2.1. Scheduled
+delivery remains unobserved; the schedule is enabled and manual recovery works.
+Zen's normal update command upgraded permanent 0.2.0 to signed 0.2.1. The extension
+remained active with `signedState: 2` after restart, retained the exact total of 39
+through update and restart, and passed all 13 live blocker checks afterward.
+The everyday Zen profile was untouched.
+
 There are no runtime npm dependencies in the extension. At implementation time,
 `npm audit` reports an upstream `node-forge` advisory through web-ext's Android
 debugging dependency. The current published node-forge version has no patched
