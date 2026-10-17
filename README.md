@@ -1,7 +1,40 @@
 # rotblock
 
-YouTube Shorts blocker for Zen. This first stage provides browser inspection;
-the extension itself has not been built yet.
+Always-on YouTube Shorts blocker for Firefox and Zen. Hides Shorts shelves,
+cards, sidebar entries, and channel tabs, and redirects Shorts URLs to YouTube home.
+Regular videos, search, subscriptions, playlists, comments, and embedded players
+remain available. No popup, analytics, account connection, or data collection.
+
+## Install
+
+Use the Mozilla-signed `.xpi` from this repository's GitHub Releases when a signed
+release is available. In Zen, open `about:addons`, choose the gear menu, select
+**Install Add-on From File**, and choose the XPI. This installation survives restarts.
+The browser checks the repository's update manifest for new signed releases.
+
+The build command produces an **unsigned ZIP for development**, which cannot be
+used as a permanent signed installation. See [signing and releases](docs/releases.md).
+
+For development, use Node.js 22 or newer and run `npm ci`, then:
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Launch Zen with a temporary development extension and automatic reloading. |
+| `npm run browser -- --extension` | Open the signed-in testing profile with the unpacked extension temporarily loaded. |
+| `npm run test:unit` | Run route, DOM, and release-publishing tests without opening a browser. |
+| `npm test` | Run unit tests and the local Zen/profile integration checks. Close the testing session first. |
+| `npm run test:live` | Check the extension on live YouTube using the signed-in profile. Close the testing session first. |
+| `npm run lint` | Validate the self-distributed extension using Mozilla's linter. |
+| `npm run build` | Build `artifacts/extension/rotblock-0.1.0.zip`. |
+| `npm run sign` | Submit to Mozilla for unlisted signing using local credentials. |
+| `npm run publish -- path/to/signed.xpi` | Upload, verify the download, then publish automatic-update metadata. |
+
+Disable rotblock through Zen's Add-ons Manager and reload YouTube if needed.
+The supported interface is desktop YouTube; navigation rules also cover
+`youtube.com` and `m.youtube.com`. The add-on requires Firefox/Gecko 140 or newer.
+It leaves ordinary `/watch` and `/embed` URLs usable, even for a short video.
+No-href Shorts navigation labels were inspected in English; other languages and
+future YouTube layouts may require selector adjustments.
 
 ## Start the testing browser
 

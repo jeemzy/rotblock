@@ -1,5 +1,6 @@
 import { access, mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Builder } from 'selenium-webdriver';
 import firefox from 'selenium-webdriver/firefox.js';
 import seleniumManager from 'selenium-webdriver/common/seleniumManager.js';
@@ -8,7 +9,7 @@ export const zenBinary = process.env.ZEN_BINARY ?? 'G:\\apps2\\Zen Browser\\zen.
 export const profileDirectory = path.join(process.env.LOCALAPPDATA, 'rotblock', 'zen-profile');
 
 /** Start a headed Zen session. Selenium Manager provisions geckodriver. */
-export async function startZenSession() {
+export async function startZenSession({ extension = false } = {}) {
   await access(zenBinary);
   await mkdir(profileDirectory, { recursive: true });
   // Zen reports its own product version to --version. Driver selection needs Gecko's version.
@@ -29,6 +30,7 @@ export async function startZenSession() {
     .build();
   try {
     await driver.manage().setTimeouts({ pageLoad: 45_000, script: 15_000 });
+    if (extension) await driver.installWebExtension(fileURLToPath(new URL('../extension/', import.meta.url)), { permanent: false });
   } catch (error) {
     await driver.quit().catch(() => {});
     throw error;

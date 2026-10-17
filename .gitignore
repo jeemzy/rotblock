@@ -1,4 +1,8 @@
 node_modules/
 artifacts/
 .env
+.env.*
+*.env
+!.env.example
 *.log
+.amo-upload-uuid

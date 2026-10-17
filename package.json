@@ -3,17 +3,28 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "YouTube Shorts blocker for Zen; browser inspection setup",
+  "description": "Block YouTube Shorts in Firefox and Zen",
+  "license": "MIT",
   "engines": {
     "node": ">=22.0.0"
   },
   "scripts": {
-    "test": "node --test",
+    "test": "node --test --test-concurrency=1",
+    "test:unit": "node --test test/extension.test.mjs test/release.test.mjs",
+    "test:live": "node tools/live-check.mjs",
+    "dev": "web-ext run",
+    "lint": "web-ext lint --warnings-as-errors",
+    "build": "web-ext build --overwrite-dest",
+    "sign": "node tools/release.mjs sign",
+    "publish": "node tools/release.mjs publish",
     "browser": "node tools/browser.mjs",
     "browser:login": "node tools/login.mjs",
     "test:browser": "node --test test/zen.integration.test.mjs"
   },
   "devDependencies": {
-    "selenium-webdriver": "4.51.0"
+    "adm-zip": "0.6.1",
+    "jsdom": "26.1.0",
+    "selenium-webdriver": "4.51.0",
+    "web-ext": "10.8.0"
   }
 }

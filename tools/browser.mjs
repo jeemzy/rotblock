@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { startZenSession, profileDirectory } from './zen.mjs';
 import { inspectYouTube } from './youtube-dom.mjs';
 
-const driver = await startZenSession();
+const driver = await startZenSession({ extension: process.argv.includes('--extension') });
 try {
   await driver.get('https://www.youtube.com/');
 } catch (error) {

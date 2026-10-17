@@ -15,3 +15,16 @@ test('a failed session configuration closes Zen and releases its profile', async
   await assert.rejects(startZenSession(), error);
   assert.equal(closed, true, 'Never leave an unreachable driver holding the persistent profile');
 });
+
+test('a rejected extension install closes the launched browser', async context => {
+  let closed = false;
+  const error = new Error('Extension installation failed');
+  context.mock.method(seleniumManager, 'binaryPaths', () => ({ driverPath: 'unused-by-test' }));
+  context.mock.method(Builder.prototype, 'build', async () => ({
+    manage: () => ({ setTimeouts: async () => {} }),
+    installWebExtension: async () => { throw error; },
+    quit: async () => { closed = true; },
+  }));
+  await assert.rejects(startZenSession({ extension: true }), error);
+  assert.equal(closed, true);
+});

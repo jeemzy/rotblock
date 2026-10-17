@@ -1,0 +1,1 @@
+globalThis.rotblock.start(window);

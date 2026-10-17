@@ -24,6 +24,11 @@ Never target shared ancestors such as `ytd-item-section-renderer`,
 Parse link URLs when implementing behavior; CSS prefix examples above describe
 the observed relative URLs only.
 
+During implementation, a Shorts search result also contained a normal `/watch`
+timestamp link in its description snippet. Individual search cards therefore use
+their primary `a#thumbnail` URL for classification. Mixed shelves and sections
+still preserve their regular watch links. This case has a regression test.
+
 ## Channel page
 
 On `/@NickDiGiovanni`, the channel tabs are `yt-tab-shape[role="tab"]`, with

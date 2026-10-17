@@ -1,0 +1,7 @@
+[data-rotblock-hidden="true"] {
+  display: none !important;
+}
+
+html[data-rotblock-redirecting] body {
+  visibility: hidden !important;
+}
