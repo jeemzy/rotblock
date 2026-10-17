@@ -127,6 +127,16 @@ The signed 0.2.0 release then upgraded permanent 0.1.1 through Zen's **Check for
 Updates** command. After a restart, 0.2.0 remained active and signed (state 2),
 the popup retained the same total of 39, and direct Shorts URLs still redirected.
 
+The 0.2.1 Actions rollout passed 45 local automated tests and the tag-triggered
+build checks. GitHub returned a synthetic `untagged-*` name for the draft release;
+recovery now finds it through the bound source commit and release state, then
+restores the intended tag when publishing. Rerunning only the failed worker reused
+the saved build without moving the tag or rebuilding. The recovered signing job
+finished in 14 seconds and its automatic follow-up exited in 22 seconds while
+approval was pending. An independent check verified Mozilla's signed package hash
+and original payload, and found no credential values in tracked files, packages,
+release state, or the successful signing/follow-up logs.
+
 There are no runtime npm dependencies in the extension. At implementation time,
 `npm audit` reports an upstream `node-forge` advisory through web-ext's Android
 debugging dependency. The current published node-forge version has no patched
