@@ -79,5 +79,9 @@ Local JSON captures and PNG screenshots are in `artifacts/` and ignored by Git.
 The reusable `inspect()` console command captures the current structure without
 modifying the page. The signed-in structure captures omit `aria-label` values to
 avoid recording video-title labels. Additional local evidence includes the
-selector collision check and observed navigation events. Other languages,
-alternate layouts, and the eventual blocker itself remain to be tested.
+selector collision check and observed navigation events. The implemented blocker
+passed 13 live checks, including home, subscriptions, search, channel tabs,
+dynamic/recycled cards, direct and history navigation, ordinary video playback,
+and embedded players on an unrelated website. These checks also passed with
+the permanently installed Mozilla-signed 0.1.0 package after restarting Zen.
+Other languages and alternate layouts remain outside this verification.

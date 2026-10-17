@@ -53,12 +53,25 @@ to avoid silently overwriting a simultaneous update.
 The update JSON contains the version, HTTPS download URL, hash, and Gecko minimum
 version. The browser handles checking and installation. Run `git pull --ff-only`
 after publishing to obtain the remote update-manifest commit before further work.
+GitHub's raw-file endpoint may keep the previous manifest cached for five minutes.
+An immediate browser update check can therefore report no updates; retry once the
+cached manifest expires.
 
 ## Development verification and limits
 
 `artifacts/live-verification.json` records live checks locally and is ignored by Git.
 Unsigned temporary installs are for testing; they do not prove permanent installation
 or signed automatic updates. Those checks require two actual Mozilla-signed releases.
+
+On 2026-10-17, Mozilla-signed 0.1.0 installed permanently in the dedicated Zen
+profile, remained active after restart, and passed all 13 live checks. The Add-ons
+Manager reported `signedState: 2` and `temporarilyInstalled: false`, with signature
+verification enabled. Selenium disables extension updates during automation;
+the signed update check enables normal extension updates only in the test profile.
+Zen's **Check for Updates** command then upgraded 0.1.0 to signed, permanent
+0.1.1 through the public update manifest and GitHub release download.
+After another restart, 0.1.1 remained signed and active, redirected a direct
+Shorts URL home, hid all visible Shorts links, and preserved regular video links.
 
 There are no runtime npm dependencies in the extension. At implementation time,
 `npm audit` reports an upstream `node-forge` advisory through web-ext's Android
