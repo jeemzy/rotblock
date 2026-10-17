@@ -3,7 +3,26 @@
 Always-on YouTube Shorts blocker for Firefox and Zen. Hides Shorts shelves,
 cards, sidebar entries, and channel tabs, and redirects Shorts URLs to YouTube home.
 Regular videos, search, subscriptions, playlists, comments, and embedded players
-remain available. No popup, analytics, account connection, or data collection.
+remain available. Click the toolbar icon to open local blocking stats. No analytics,
+account connection, or data sent to a server.
+
+## Blocking stats
+
+The toolbar popup shows Shorts cards hidden **today**, **all time**, and over the
+**last seven days**. Pin rotblock from Zen's Extensions menu to keep it in the toolbar.
+Counts persist across restarts and extension updates, and can be cleared with
+**Reset stats** followed by **Clear stats**.
+
+Each distinct Short is counted once per page load, including cards loaded outside
+the viewport. DOM rescans, duplicate links, and nested shelf containers do not
+increase the count. YouTube's in-page navigation shares that page-load count;
+reloading starts a new count. Blocked Shorts URL openings are not counted.
+Stats start with this version; earlier activity cannot be reconstructed.
+
+Only aggregate totals and seven local-calendar daily counts are saved in the
+browser profile using the `storage` permission. Video IDs used for deduplication
+stay in page memory; video titles, URLs, and browsing history are not stored.
+The popup's blocking status also checks whether YouTube site access is allowed.
 
 ## Install
 

@@ -73,6 +73,14 @@ Zen's **Check for Updates** command then upgraded 0.1.0 to signed, permanent
 After another restart, 0.1.1 remained signed and active, redirected a direct
 Shorts URL home, hid all visible Shorts links, and preserved regular video links.
 
+The 0.2.0 popup adds local aggregate statistics with only the `storage` permission.
+Development verification passed 25 automated tests and 13 live blocker checks.
+Zen's toolbar action opened the popup at 360 CSS pixels wide. Live checks covered
+cross-tab updates, reset confirmation, duplicate/recycled cards, and preservation
+of the same total (39) across a testing-browser restart. No video IDs or URLs were
+present in stored statistics; only the schema version, lifetime total, and seven
+local-calendar day buckets were stored.
+
 There are no runtime npm dependencies in the extension. At implementation time,
 `npm audit` reports an upstream `node-forge` advisory through web-ext's Android
 debugging dependency. The current published node-forge version has no patched

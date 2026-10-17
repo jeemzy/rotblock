@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>rotblock</title>
+  <link rel="stylesheet" href="popup.css">
+  <script type="module" src="popup.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand"><img src="icon.svg" width="30" height="30" alt=""><h1>rotblock</h1></div>
+    <span class="status" id="status" role="status">Checking…</span>
+  </header>
+  <main>
+    <section class="numbers" aria-label="Shorts cards hidden">
+      <div><p class="eyebrow">Shorts hidden today</p><p class="today" id="today">—</p></div>
+      <div class="lifetime"><p class="eyebrow">All time</p><p id="total">—</p></div>
+    </section>
+    <section class="activity" aria-labelledby="activity-title">
+      <div class="section-heading"><h2 id="activity-title">Last 7 days</h2><span id="week-total">— hidden</span></div>
+      <ol class="chart" id="chart" aria-label="Daily Shorts cards hidden"></ol>
+      <p class="empty" id="empty" hidden>Counts start as you browse YouTube.</p>
+    </section>
+    <p class="scope">Each Short counts once per page load.<br>Only counts are saved, on this device.</p>
+    <button class="access" id="grant-access" hidden>Allow YouTube access</button>
+    <p class="feedback" id="feedback" role="status"></p>
+  </main>
+  <footer>
+    <div class="footer-row"><span class="local"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="2"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg>Local stats</span><button id="reset" disabled>Reset stats</button></div>
+    <section id="reset-confirm" class="reset-confirm" aria-label="Confirm reset" hidden>
+      <p>Clear all stats? This cannot be undone.</p>
+      <div><button id="reset-cancel">Cancel</button><button id="reset-accept">Clear stats</button></div>
+    </section>
+    <span class="version" id="version"></span>
+  </footer>
+</body>
+</html>

@@ -43,7 +43,7 @@
     return links.some(link => isShortsUrl(link.href, element.baseURI));
   }
 
-  function scan(root) {
+  function scan(root, onHidden = () => {}) {
     const candidates = new Set(root.querySelectorAll?.(containers) ?? []);
     for (let element = root.nodeType === 1 ? root : root.parentElement; element; element = element.parentElement) {
       if (element.matches(containers)) candidates.add(element);
@@ -51,16 +51,33 @@
     for (const element of candidates) {
       if (shouldHide(element)) {
         if (element.getAttribute(hidden) !== 'true') element.setAttribute(hidden, 'true');
+        onHidden(element);
       } else {
         element.removeAttribute(hidden);
       }
     }
   }
 
-  function start(win) {
+  function start(win, { onHidden = () => {} } = {}) {
     if (win.top !== win || !youtubeUrl(win.location.href)) return;
     if (sessions.has(win)) return sessions.get(win);
     const doc = win.document;
+    // Video IDs stay in this document's memory; only aggregate increments leave it.
+    const seen = new Set();
+    let newCards = 0;
+    const capture = element => {
+      for (const link of element.querySelectorAll('a[href]')) {
+        const url = youtubeUrl(link.href, doc.baseURI);
+        const id = url?.pathname.match(/^\/shorts\/([^/]+)\/?$/)?.[1];
+        if (id && !seen.has(id)) { seen.add(id); newCards++; }
+      }
+    };
+    const report = () => {
+      if (!newCards) return;
+      const count = newCards;
+      newCards = 0;
+      onHidden(count);
+    };
     let scheduled = false;
     let stopped = false;
     let redirecting = false;
@@ -87,8 +104,9 @@
         pending.clear();
         for (const root of roots) {
           if (root !== doc && !root.isConnected) continue;
-          if (!roots.some(other => other !== root && other.contains(root))) scan(root);
+          if (!roots.some(other => other !== root && other.contains(root))) scan(root, capture);
         }
+        report();
       });
     }
     const observer = new win.MutationObserver(records => {
@@ -126,7 +144,7 @@
       sessions.delete(win);
     };
     sessions.set(win, stop);
-    if (!guard()) scan(doc);
+    if (!guard()) { scan(doc, capture); report(); }
     return stop;
   }
 

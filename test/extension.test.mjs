@@ -111,3 +111,23 @@ test('network redirect rules match only Shorts and only main-frame navigations',
   for (const url of ['https://example.com/shorts/abc','https://www.youtube.com/watch?v=abc','https://www.youtube.com/shortstuff','https://youtube.com.evil.test/shorts/abc']) assert.equal(pattern.test(url), false);
   assert.equal(rule.action.redirect.url, 'https://www.youtube.com/');
 });
+
+test('counts individual Shorts once per document across nested shelves, rescans, and recycled cards', async () => {
+  const dom = page();
+  const counts = [];
+  const stop = dom.window.rotblock.start(dom.window, { onHidden: count => counts.push(count) });
+  const doc = dom.window.document;
+  try {
+    assert.equal(counts.reduce((a, b) => a + b, 0), 2, 'two videos, not their nested containers or navigation');
+    doc.querySelector('#short-card a').setAttribute('title', 'trigger a rescan');
+    doc.querySelector('#mixed-section').insertAdjacentHTML('beforeend', '<ytd-video-renderer id="duplicate"><a href="/shorts/abc?feature=share">Repeated Short</a></ytd-video-renderer>');
+    await new Promise(resolve => dom.window.setTimeout(resolve, 20));
+    assert.equal(counts.reduce((a, b) => a + b, 0), 2);
+    doc.querySelector('#search-short a').href = '/shorts/new-video';
+    await new Promise(resolve => dom.window.setTimeout(resolve, 20));
+    assert.equal(counts.reduce((a, b) => a + b, 0), 3, 'a reused card with a new video counts');
+    doc.querySelector('#search-short a').href = '/watch?v=regular';
+    await new Promise(resolve => dom.window.setTimeout(resolve, 20));
+    assert.equal(counts.reduce((a, b) => a + b, 0), 3);
+  } finally { stop(); dom.window.close(); }
+});
