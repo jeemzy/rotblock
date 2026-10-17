@@ -80,6 +80,9 @@ cross-tab updates, reset confirmation, duplicate/recycled cards, and preservatio
 of the same total (39) across a testing-browser restart. No video IDs or URLs were
 present in stored statistics; only the schema version, lifetime total, and seven
 local-calendar day buckets were stored.
+The signed 0.2.0 release then upgraded permanent 0.1.1 through Zen's **Check for
+Updates** command. After a restart, 0.2.0 remained active and signed (state 2),
+the popup retained the same total of 39, and direct Shorts URLs still redirected.
 
 There are no runtime npm dependencies in the extension. At implementation time,
 `npm audit` reports an upstream `node-forge` advisory through web-ext's Android
