@@ -3,9 +3,9 @@
     "rotblock@jeemzy.github.io": {
       "updates": [
         {
-          "version": "0.1.0",
-          "update_link": "https://github.com/jeemzy/rotblock/releases/download/v0.1.0/rotblock-0.1.0.xpi",
-          "update_hash": "sha256:f0e92fc69415cb63e45aafac1b95c0055e4eb9bc406d4c78d7f967883090b54c",
+          "version": "0.1.1",
+          "update_link": "https://github.com/jeemzy/rotblock/releases/download/v0.1.1/rotblock-0.1.1.xpi",
+          "update_hash": "sha256:d82d30fa228f937f9f64ccf2497bbaf32471680b1574314e11181a49e39611fb",
           "applications": {
             "gecko": {
               "strict_min_version": "140.0"
