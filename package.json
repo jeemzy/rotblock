@@ -1,0 +1,19 @@
+{
+  "name": "rotblock",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "YouTube Shorts blocker for Zen; browser inspection setup",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "test": "node --test",
+    "browser": "node tools/browser.mjs",
+    "browser:login": "node tools/login.mjs",
+    "test:browser": "node --test test/zen.integration.test.mjs"
+  },
+  "devDependencies": {
+    "selenium-webdriver": "4.51.0"
+  }
+}
