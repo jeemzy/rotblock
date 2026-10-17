@@ -1,6 +1,6 @@
 {
   "name": "rotblock",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Block YouTube Shorts in Firefox and Zen",
@@ -19,7 +19,9 @@
     "publish": "node tools/release.mjs publish",
     "browser": "node tools/browser.mjs",
     "browser:login": "node tools/login.mjs",
-    "test:browser": "node --test test/zen.integration.test.mjs"
+    "test:browser": "node --test test/zen.integration.test.mjs",
+    "browser:extension": "node tools/browser.mjs --extension",
+    "browser:system": "node tools/browser.mjs --system-access"
   },
   "devDependencies": {
     "adm-zip": "0.6.1",

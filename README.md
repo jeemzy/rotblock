@@ -7,8 +7,8 @@ remain available. No popup, analytics, account connection, or data collection.
 
 ## Install
 
-Use the Mozilla-signed `.xpi` from this repository's GitHub Releases when a signed
-release is available. In Zen, open `about:addons`, choose the gear menu, select
+Download the Mozilla-signed `.xpi` from [GitHub Releases](https://github.com/jeemzy/rotblock/releases/latest).
+In Zen, open `about:addons`, choose the gear menu, select
 **Install Add-on From File**, and choose the XPI. This installation survives restarts.
 The browser checks the repository's update manifest for new signed releases.
 
@@ -20,12 +20,13 @@ For development, use Node.js 22 or newer and run `npm ci`, then:
 | Command | Purpose |
 | --- | --- |
 | `npm run dev` | Launch Zen with a temporary development extension and automatic reloading. |
-| `npm run browser -- --extension` | Open the signed-in testing profile with the unpacked extension temporarily loaded. |
+| `npm run browser:extension` | Open the signed-in testing profile with the unpacked extension temporarily loaded. |
+| `npm run browser:system` | Open the testing profile with explicit browser UI access for signed installation/update checks. |
 | `npm run test:unit` | Run route, DOM, and release-publishing tests without opening a browser. |
 | `npm test` | Run unit tests and the local Zen/profile integration checks. Close the testing session first. |
 | `npm run test:live` | Check the extension on live YouTube using the signed-in profile. Close the testing session first. |
 | `npm run lint` | Validate the self-distributed extension using Mozilla's linter. |
-| `npm run build` | Build `artifacts/extension/rotblock-0.1.0.zip`. |
+| `npm run build` | Build an unsigned versioned ZIP in `artifacts/extension/`. |
 | `npm run sign` | Submit to Mozilla for unlisted signing using local credentials. |
 | `npm run publish -- path/to/signed.xpi` | Upload, verify the download, then publish automatic-update metadata. |
 

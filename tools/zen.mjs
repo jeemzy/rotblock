@@ -9,7 +9,7 @@ export const zenBinary = process.env.ZEN_BINARY ?? 'G:\\apps2\\Zen Browser\\zen.
 export const profileDirectory = path.join(process.env.LOCALAPPDATA, 'rotblock', 'zen-profile');
 
 /** Start a headed Zen session. Selenium Manager provisions geckodriver. */
-export async function startZenSession({ extension = false } = {}) {
+export async function startZenSession({ extension = false, systemAccess = false } = {}) {
   await access(zenBinary);
   await mkdir(profileDirectory, { recursive: true });
   // Zen reports its own product version to --version. Driver selection needs Gecko's version.
@@ -24,9 +24,11 @@ export async function startZenSession({ extension = false } = {}) {
     .setBinary(zenBinary)
     .setPreference('zen.welcome-screen.seen', true)
     .addArguments('-no-remote', '-profile', profileDirectory);
+  const service = new firefox.ServiceBuilder(driverPath);
+  if (systemAccess) service.addArguments('--allow-system-access');
   const driver = await new Builder().forBrowser('firefox')
     .setFirefoxOptions(options)
-    .setFirefoxService(new firefox.ServiceBuilder(driverPath))
+    .setFirefoxService(service)
     .build();
   try {
     await driver.manage().setTimeouts({ pageLoad: 45_000, script: 15_000 });

@@ -37,6 +37,10 @@ reads the local credential file automatically; publishing does not load Mozilla 
    For the first update test, sign `0.1.1`, publish it, then use the Add-ons Manager's
    **Check for Updates** command from an installation of signed `0.1.0`.
 
+For automated Add-ons Manager inspection, use `npm run browser:system`.
+This opts the dedicated testing session into geckodriver's browser UI access.
+Normal inspection sessions do not enable it; signature verification stays enabled.
+
 Publishing checks the XPI's embedded ID and version plus Mozilla signature metadata.
 Firefox verifies the actual cryptographic signature at installation. The script
 creates a GitHub Release with `rotblock-<version>.xpi`, downloads that public asset,
