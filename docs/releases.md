@@ -142,7 +142,7 @@ slots during verification. Manual dispatch of the same serialized finalizer
 published the signed release in 16 seconds. Its anonymous public download matched
 Mozilla's SHA-256, release state reached `complete`, the unsigned asset was removed,
 and both `updates.json` and GitHub's latest release pointed to 0.2.1. Scheduled
-delivery remains unobserved; the schedule is enabled and manual recovery works.
+delivery was still unobserved during this initial test; manual recovery worked.
 Zen's normal update command upgraded permanent 0.2.0 to signed 0.2.1. The extension
 remained active with `signedState: 2` after restart, retained the exact total of 39
 through update and restart, and passed all 13 live blocker checks afterward.
@@ -150,6 +150,34 @@ The everyday Zen profile was untouched.
 The signed popup page rendered its counts and seven-day chart correctly. An extra
 toolbar-click automation check was inconsistent in Zen and remains inconclusive;
 no popup script error appeared in the browser console.
+
+On 2026-10-18, **0.2.2 completed the unattended end-to-end release test**. The
+[tag-triggered run](https://github.com/jeemzy/rotblock/actions/runs/39145138488)
+built and submitted the release. Its
+[automatic follow-up](https://github.com/jeemzy/rotblock/actions/runs/39145199668)
+reported approval pending and exited. A later
+[scheduled run](https://github.com/jeemzy/rotblock/actions/runs/39145429910)
+published the signed XPI and updated the manifest. All three succeeded on their
+first attempt; no manual dispatch or rerun was used. The tag event arrived at
+18:28:17 and publication completed at 18:32:18 Europe/Warsaw, about four minutes.
+
+Independent verification compared the anonymous public XPI to Mozilla's supplied
+hash, the original ZIP downloaded from the build's Actions artifact, and the
+durable payload hash. Signature metadata, ID/version, update hash, latest-release
+marker, draft-asset removal, and the public raw update manifest all passed. Neither
+credential value appeared in the packages, release state, or the three run logs.
+GitHub's observed scheduled deliveries can still be hours apart; the ten-minute
+cron expression is not a delivery-time guarantee.
+
+The dedicated signed-in Zen profile then ran **headlessly**, upgraded normally
+from signed permanent 0.2.1 to 0.2.2, and restarted. Signature enforcement remained
+enabled; the extension stayed active, permanent, and signed (state 2). The exact
+stored stats, including the total of 39, survived both update and restart. The
+popup page rendered all seven days and all 13 live blocker checks passed. The
+everyday profile was untouched. Local evidence is saved under the ignored
+`artifacts/e2e-0.2.2-*` files. This verifies the release pipeline and headless
+browser behavior; it does not resolve the earlier native toolbar-click automation
+limitation.
 
 There are no runtime npm dependencies in the extension. At implementation time,
 `npm audit` reports an upstream `node-forge` advisory through web-ext's Android
