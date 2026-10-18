@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "rotblock",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Hide YouTube Shorts and redirect Shorts links to YouTube home.",
   "icons": {
     "48": "icon.svg",
